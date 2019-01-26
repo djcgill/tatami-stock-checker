@@ -8,7 +8,7 @@ def load_config():
         config = yaml.load(config_file)
     return config
 
-def send_email():
+def send_email(message):
     server = smtplib.SMTP(smtp_server)
     server.set_debuglevel(1)
     server.sendmail(from_email, to_email, message)
@@ -35,11 +35,9 @@ response = requests.get(url, timeout=5)
 in_stock = get_stock(response, size)
 
 if in_stock:
-    print ("ITEM IN STOCK")
+    message = f'{config["product"]}, size {size} is in stock at {url}'
     try:
         send_email()
     except Exception:
         # Send out SMS via twilo
         raise NotImplementedError
-else:
-    print ('NOT IN STOCK')
