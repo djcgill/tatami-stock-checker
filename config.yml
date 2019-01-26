@@ -1,0 +1,6 @@
+tatami_url: "https://www.tatamifightwear.com/collections/bjj-gi/products/"
+product: "nova-mk4-black"
+size: "a3"
+email_address: "from_email"
+to_email_address: "to_email"
+smtp_server: "smtp_server"
