@@ -1,28 +1,38 @@
 from bs4 import BeautifulSoup
 import requests
 import smtplib
+import yaml
+
+def load_config():
+    with open('config.yml', 'r') as config_file:
+        config = yaml.load(config_file)
+    return config
 
 def send_email():
-    email_address = ""
-    password = ""
-    message = """
-                BLACK NOVA GI ON TATAMI FIGHTWEAR IS IN STOCK
-                https://www.tatamifightwear.com/collections/bjj-gi/products/nova-mk4-black
-              """
-    server = smtplib.SMTP('smtp.gmail.com')
+    server = smtplib.SMTP(smtp_server)
     server.set_debuglevel(1)
-    server.sendmail(email_address, email_address, message)
+    server.sendmail(from_email, to_email, message)
     server.quit()
 
-def get_stock(store_response):
+def get_stock(store_response, size):
     soup = BeautifulSoup(store_response.content, "html.parser")
     # Element div class="swatch-element a3 soldout" data-value="A3"
-    item_stock = soup.find('div',attrs={"class":"swatch-element a3 available"})
+    item_stock = soup.find('div',attrs={"class":f"swatch-element {size} available"})
     return item_stock
 
-url = "https://www.tatamifightwear.com/collections/bjj-gi/products/nova-mk4-black"
+config = load_config()
+from_email = config['email_address']
+to_email = config['to_email_address']
+smtp_server = config['smtp_server']
+size = config['size']
+
+if config['tatami_url'].endswith('/'):
+    url = f'{config["tatami_url"]}{config["product"]}'
+else:
+    url = f'{config["tatami_url"]}/{config["product"]}'
+
 response = requests.get(url, timeout=5)
-in_stock = get_stock(response)
+in_stock = get_stock(response, size)
 
 if in_stock:
     print ("ITEM IN STOCK")
